@@ -47,11 +47,20 @@ io_handlers[io_events.EVENT_ROOM_CREATE] = function(data,context)
     var userid = user_sessions[sessionid];
     if(_.has(free_users,userid))
     {
-        var user = users[userid];
-        var r = new Room(data.name,data.max,user); 
-        rooms[r.id] = r;
-        roomsByName[r.name] = r.id;
-        delete free_users[userid];
+        if(!_.has(roomsByName,data.name))
+        {
+            var user = users[userid];
+            var r = new Room(data.name,data.max,user); 
+            rooms[r.id] = r;
+            roomsByName[r.name] = r.id;
+            delete free_users[userid];
+            context.socket.join(r.name);
+            context.socket.emit(io_events.EVENT_ROOM_CREATE,r);
+        }
+        else
+        {
+            //exceptional case       
+        }
     }
     else
     {
@@ -70,6 +79,9 @@ io_handlers[io_events.EVENT_ROOM_JOIN] = function(data,context)
         r.join(user);
         user.setRoomID(r.id);
         delete free_users[userid];
+        context.socket.join(r.name);
+        context.socket.emit(io_events.EVENT_ROOM_JOIN,r);
+        context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,r);
     }
     else
     {
@@ -87,11 +99,17 @@ io_handlers[io_events.EVENT_ROOM_LEAVE] = function(data,context)
         var r = rooms[data.id];
         r.leave(user);
         user.setRoomID(0);
+        context.socket.leave(r.name);
         free_users[user.id] = PLACEHOLDER;
+        context.socket.emit(io_events.EVENT_ROOM_LEAVE,{});
         if(r.isEmpty())
         {
             delete roomsByName[r.name];
             delete rooms[r.id];
+        }
+        else
+        {
+            context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,r);
         }
     }
     else

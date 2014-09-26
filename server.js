@@ -42,6 +42,7 @@ var io_handlers = require("./io_handlers");
 
 /* Socket.IO events */
 io.on("connection", function(socket){
+  console.log("new connection");
   
   _.each(io_handlers,function(value, key)
   {
