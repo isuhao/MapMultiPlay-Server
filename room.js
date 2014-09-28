@@ -64,4 +64,4 @@ Room.prototype.isEmpty = function()
     return false;
 }
 
-module_exports = Room;
+module.exports = Room;

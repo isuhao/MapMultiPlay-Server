@@ -46,19 +46,11 @@ io.on("connection", function(socket){
   
   _.each(io_handlers,function(value, key)
   {
+    console.log("    [io] listen:"+key);
     socket.on(key,function(data)
     {
+        console.log("    [io] event:"+key);
         value(data,{'socket':socket, 'io': io});
     });
   });
-  /* 
-    When a client disconnects from the server, the event "disconnect" is automatically 
-    captured by the server. It will then emit an event called "userDisconnected" to 
-    all participants with the id of the client that disconnected
-  */
-  socket.on("disconnect", function() {
-    participants = _.without(participants,_.findWhere(participants, {id: socket.id}));
-    io.sockets.emit("userDisconnected", {id: socket.id, sender:"system"});
-  });
-
 });

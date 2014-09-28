@@ -22,4 +22,4 @@ User.prototype.setRoomID = function(room_id)
     this.room_id = room_id;
 }
 
-module_exports = User;
+module.exports = User;

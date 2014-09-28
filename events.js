@@ -13,4 +13,4 @@ var io_events =
     EVENT_ROOM_PARTICIPANTS_CHANGE : "room_parts_change"
 }
 
-module_exports = io_events;
+module.exports = io_events;

@@ -126,4 +126,19 @@ io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
     // room.
 }
 
-module_exports=io_handlers;
+io_handlers["disconnect"] = function(data,context)
+{
+    var sessionid = getSessionId(context);
+    var userid = user_sessions[sessionid];
+    if (userid) {
+        var user = users[userid];
+        if (user.room_id) {
+            io_handlers[io_events.EVENT_ROOM_LEAVE] ({'id':user.room_id},context);
+        };
+        delete free_users[userid];
+        delete user_sessions[sessionid];
+        delete users[userid];
+    };
+}
+
+module.exports=io_handlers;
