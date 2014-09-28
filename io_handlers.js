@@ -22,6 +22,23 @@ function getSessionId(context)
     return context.socket.id;
 }
 
+function transformRoomObject(room)
+{
+    var r = {
+        'id':room.id,
+        'name':room.name,
+        'max':room.max,
+        'owner':room.owner,
+        'parts':[]
+    }
+    _.each(room.parts,function(id)
+    {
+        r.parts.push(users[id]);
+
+    });
+    return r;
+}
+
 io_handlers[io_events.EVENT_USER_SIGNIN] = function(data,context)
 {
 }
@@ -38,6 +55,7 @@ io_handlers[io_events.EVENT_USER_TRIAL] = function(data,context)
     users[u.id] = u;
     free_users[u.id] = PLACEHOLDER;
     user_sessions[getSessionId(context)] = u.id ;//FIXME session id?
+    context.socket.emit(io_events.EVENT_USER_TRIAL,u);
     //FIXME emit socket io event
 }
 
@@ -55,7 +73,8 @@ io_handlers[io_events.EVENT_ROOM_CREATE] = function(data,context)
             roomsByName[r.name] = r.id;
             delete free_users[userid];
             context.socket.join(r.name);
-            context.socket.emit(io_events.EVENT_ROOM_CREATE,r);
+            var rObj = transformRoomObject(r);
+            context.socket.emit(io_events.EVENT_ROOM_CREATE,rObj);
         }
         else
         {
@@ -80,8 +99,9 @@ io_handlers[io_events.EVENT_ROOM_JOIN] = function(data,context)
         user.setRoomID(r.id);
         delete free_users[userid];
         context.socket.join(r.name);
-        context.socket.emit(io_events.EVENT_ROOM_JOIN,r);
-        context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,r);
+        var rObj = transformRoomObject(r);
+        context.socket.emit(io_events.EVENT_ROOM_JOIN,rObj);
+        context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,rObj);
     }
     else
     {
@@ -109,7 +129,8 @@ io_handlers[io_events.EVENT_ROOM_LEAVE] = function(data,context)
         }
         else
         {
-            context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,r);
+            var rObj = transformRoomObject(r);
+            context.socket.broadcast.to(r.name).emit(io_events.EVENT_ROOM_PARTICIPANTS_CHANGE,rObj);
         }
     }
     else
@@ -122,7 +143,8 @@ io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
 {
     var room_id = roomsByName[data];
     var r = rooms[room_id];
-
+    var rObj = transformRoomObject(r);
+    context.socket.emit(io_events.EVENT_ROOM_FIND_BY_NAME,rObj);
     // room.
 }
 
