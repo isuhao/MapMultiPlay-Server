@@ -39,6 +39,33 @@ function transformRoomObject(room)
     return r;
 }
 
+function broadcastLocation(io)
+{
+    _.each(rooms,function(room)
+    {
+        var locs = {};
+        _.each(room.parts,function(uid)
+        {
+            var user = users[uid]
+            if (user.loc) 
+            {
+                locs[uid] = user.loc;
+            };
+        });
+        io.sockets.in(room.name).emit(io_events.EVENT_SYNC_LOCATION,locs);
+    });
+}
+
+io_handlers[io_events.EVENT_PUBLISH_LOCATION] = function(data,context)
+{
+    var sid = getSessionId(context);
+    var uid = user_sessions[sid];
+    if (uid) {
+        var user = users[uid];
+        user.setLocation(data);
+    };
+}
+
 io_handlers[io_events.EVENT_USER_SIGNIN] = function(data,context)
 {
 }
@@ -71,6 +98,7 @@ io_handlers[io_events.EVENT_ROOM_CREATE] = function(data,context)
             var r = new Room(data.name,data.max,user); 
             rooms[r.id] = r;
             roomsByName[r.name] = r.id;
+            user.setRoomID(r.id);
             delete free_users[userid];
             context.socket.join(r.name);
             var rObj = transformRoomObject(r);
@@ -170,4 +198,5 @@ io_handlers["disconnect"] = function(data,context)
     console.log('remain rooms:' + _.size(rooms) + ", remain users:" + _.size(users));
 }
 
-module.exports=io_handlers;
+exports.handlers=io_handlers;
+exports.broadcast_loc= broadcastLocation;

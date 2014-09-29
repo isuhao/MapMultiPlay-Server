@@ -44,7 +44,7 @@ var io_handlers = require("./io_handlers");
 io.on("connection", function(socket){
   console.log("new connection");
   
-  _.each(io_handlers,function(value, key)
+  _.each(io_handlers.handlers,function(value, key)
   {
     console.log("    [io] listen:"+key);
     socket.on(key,function(data)
@@ -52,5 +52,12 @@ io.on("connection", function(socket){
         console.log("    [io] event:"+key);
         value(data,{'socket':socket, 'io': io});
     });
+
   });
 });
+
+var intervalId = setInterval(function()
+  {
+    console.log("broadcast loc");
+    io_handlers.broadcast_loc(io);
+  },3000);
