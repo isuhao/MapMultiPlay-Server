@@ -106,12 +106,14 @@ io_handlers[io_events.EVENT_ROOM_CREATE] = function(data,context)
         }
         else
         {
-            //exceptional case       
+            //exceptional case   
+            context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'message':"room name exists."});    
         }
     }
     else
     {
         //exceptional case
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'message':"user not login."});
     }
 }
 
@@ -134,6 +136,7 @@ io_handlers[io_events.EVENT_ROOM_JOIN] = function(data,context)
     else
     {
         //exceptional case
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_JOIN,'message':"room not exists."});
     }
 }
 
@@ -164,6 +167,7 @@ io_handlers[io_events.EVENT_ROOM_LEAVE] = function(data,context)
     else
     {
         //exceptional case
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_LEAVE,'message':"room not exists."});
     }
 }
 
