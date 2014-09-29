@@ -142,9 +142,15 @@ io_handlers[io_events.EVENT_ROOM_LEAVE] = function(data,context)
 io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
 {
     var room_id = roomsByName[data];
-    var r = rooms[room_id];
-    var rObj = transformRoomObject(r);
-    context.socket.emit(io_events.EVENT_ROOM_FIND_BY_NAME,rObj);
+    if (room_id) {
+        var r = rooms[room_id];
+        var rObj = transformRoomObject(r);
+        context.socket.emit(io_events.EVENT_ROOM_FIND_BY_NAME, rObj);
+    }
+    else
+    {
+        context.socket.emit(io_events.EVENT_ERROR, {'event':io_events.EVENT_ROOM_FIND_BY_NAME,"message":"no rooms found." });
+    }
     // room.
 }
 
@@ -161,6 +167,7 @@ io_handlers["disconnect"] = function(data,context)
         delete user_sessions[sessionid];
         delete users[userid];
     };
+    console.log('remain rooms:' + _.size(rooms) + ", remain users:" + _.size(users));
 }
 
 module.exports=io_handlers;

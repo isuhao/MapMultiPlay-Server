@@ -1,6 +1,7 @@
 var io_events = 
 {
-    ENDPOINT_SERVER : "$server",
+    ENDPOINT_SERVER : "",
+    EVENT_ERROR : "$error",
     EVENT_PUBLISH_LOCATION : "loc",
     EVENT_SYNC_LOCATION : "sync",
     EVENT_USER_SIGNIN : "user_signin",
