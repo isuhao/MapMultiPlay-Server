@@ -1,7 +1,10 @@
 {
-  "dependencies": {
-    "express": "4.9.*",
-    "socket.io": "0.9.*",
-    "underscore": "*"
+    "name": "mmp",
+    "author":"Melo Yao",
+    "version":"0.8.0",
+    "dependencies": {
+        "express": "4.9.*",
+        "socket.io": "0.9.*",
+        "underscore": "*"
   }
 }
