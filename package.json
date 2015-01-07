@@ -5,6 +5,7 @@
     "dependencies": {
         "express": "4.9.*",
         "socket.io": "0.9.*",
+        "mysql": "*",
         "underscore": "*"
   }
 }
