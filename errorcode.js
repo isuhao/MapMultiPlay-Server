@@ -1,0 +1,12 @@
+var error_code = 
+{       
+    ERROR_USER_SIGNIN_FAILED:101,
+    ERROR_USER_ILLEGAL:102,
+    ERROR_ROOM_EXISTS:110,
+    ERROR_ROOM_NOT_EXISTS:111,
+    ERROR_ROOM_CREATE_FAILED:112,
+    ERROR_ROOM_JOIN_FULL:113,
+    ERROR_UNKNOWN:255
+}
+
+module.exports = error_code;

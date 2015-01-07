@@ -2,6 +2,7 @@ var io_events = require("./events");
 var User = require("./user");
 var Room = require("./room");
 var _ = require("underscore");
+var error_code = require("./errorcode")
 
 var PLACEHOLDER = "";
 
@@ -107,13 +108,13 @@ io_handlers[io_events.EVENT_ROOM_CREATE] = function(data,context)
         else
         {
             //exceptional case   
-            context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'message':"room name exists."});    
+            context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'code':error_code.ERROR_ROOM_EXISTS,'desc':"room name exists."});    
         }
     }
     else
     {
         //exceptional case
-        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'message':"user not login."});
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_CREATE,'code':error_code.ERROR_USER_ILLEGAL,'desc':"user is illegal."});
     }
 }
 
@@ -136,7 +137,7 @@ io_handlers[io_events.EVENT_ROOM_JOIN] = function(data,context)
     else
     {
         //exceptional case
-        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_JOIN,'message':"room not exists."});
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_JOIN,'code':error_code.ERROR_ROOM_NOT_EXISTS,'desc':"room not exists."});
     }
 }
 
@@ -167,7 +168,7 @@ io_handlers[io_events.EVENT_ROOM_LEAVE] = function(data,context)
     else
     {
         //exceptional case
-        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_LEAVE,'message':"room not exists."});
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_ROOM_LEAVE,'code':error_code.ERROR_ROOM_NOT_EXISTS,'desc':"room not exists."});
     }
 }
 
@@ -181,7 +182,7 @@ io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
     }
     else
     {
-        context.socket.emit(io_events.EVENT_ERROR, {'event':io_events.EVENT_ROOM_FIND_BY_NAME,"message":"no rooms found." });
+        context.socket.emit(io_events.EVENT_ERROR, {'event':io_events.EVENT_ROOM_FIND_BY_NAME,'code':error_code.ERROR_ROOM_NOT_EXISTS,"desc":"room not exists." });
     }
     // room.
 }
