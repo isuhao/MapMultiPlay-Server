@@ -58,6 +58,5 @@ io.on("connection", function(socket){
 
 var intervalId = setInterval(function()
   {
-    console.log("broadcast loc");
     io_handlers.broadcast_loc(io);
   },3000);
