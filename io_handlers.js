@@ -18,6 +18,8 @@ var rooms = {}; //room id : Room
 
 var roomsByName = {}; //name : room id
 
+var timeout_sessions = {}; //timeout id : session id
+
 function getSessionId(context)
 {
     return context.socket.id;
@@ -55,6 +57,36 @@ function broadcastLocation(io)
         });
         io.sockets.in(room.name).emit(io_events.EVENT_SYNC_LOCATION,locs);
     });
+}
+
+io_handlers[io_events.EVENT_RECOVER] = function(data,context)
+{
+    var sid = data.sid;
+    var timeoutid = timeout_sessions[sid];
+    if(timeoutid)
+    {
+        clearTimeout(timeoutid);
+        delete timeout_sessions[sid];
+    }
+    var uid = user_sessions[sid];
+    if(uid)
+    {
+        var newsid = getSessionId(context);
+        user_sessions[newsid] = uid;
+        delete user_sessions[sid];
+        var res = {};
+        var user = users[uid];
+        res.user = user;
+        if(user.room_id!=0)
+        {
+            var r = rooms[user.room_id];
+            if(r)
+            {
+                res.room = transformRoomObject(r);
+            }
+        }
+        context.socket.emit(io_events.EVENT_RECOVER,res);
+    }
 }
 
 io_handlers[io_events.EVENT_PUBLISH_LOCATION] = function(data,context)
@@ -187,9 +219,8 @@ io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
     // room.
 }
 
-io_handlers["disconnect"] = function(data,context)
+function disconnect(sessionid)
 {
-    var sessionid = getSessionId(context);
     var userid = user_sessions[sessionid];
     if (userid) {
         var user = users[userid];
@@ -201,6 +232,13 @@ io_handlers["disconnect"] = function(data,context)
         delete users[userid];
     };
     console.log('remain rooms:' + _.size(rooms) + ", remain users:" + _.size(users));
+    delete timeout_sessions[sessionid];
+}
+
+io_handlers["disconnect"] = function(data,context)
+{
+    var sessionid = getSessionId(context);
+    timeout_sessions[sessionid] = setTimeout(disconnect,60000,sessionid);
 }
 
 exports.handlers=io_handlers;
