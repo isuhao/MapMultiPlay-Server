@@ -87,6 +87,10 @@ io_handlers[io_events.EVENT_RECOVER] = function(data,context)
         }
         context.socket.emit(io_events.EVENT_RECOVER,res);
     }
+    else
+    {
+        context.socket.emit(io_events.EVENT_ERROR,{'event':io_events.EVENT_RECOVER,'code':io_events.ERROR_SESSION_INVALID,'desc':"session is invalid."});
+    }
 }
 
 io_handlers[io_events.EVENT_PUBLISH_LOCATION] = function(data,context)
@@ -238,7 +242,7 @@ function disconnect(sessionid)
 io_handlers["disconnect"] = function(data,context)
 {
     var sessionid = getSessionId(context);
-    timeout_sessions[sessionid] = setTimeout(disconnect,60000,sessionid);
+    timeout_sessions[sessionid] = setTimeout(disconnect,90000,sessionid);
 }
 
 exports.handlers=io_handlers;
