@@ -223,7 +223,7 @@ io_handlers[io_events.EVENT_ROOM_FIND_BY_NAME] = function(data,context)
     // room.
 }
 
-function disconnect(sessionid)
+function disconnect_client(sessionid)
 {
     var userid = user_sessions[sessionid];
     if (userid) {
@@ -242,7 +242,7 @@ function disconnect(sessionid)
 io_handlers["disconnect"] = function(data,context)
 {
     var sessionid = getSessionId(context);
-    timeout_sessions[sessionid] = setTimeout(disconnect,90000,sessionid);
+    timeout_sessions[sessionid] = setTimeout(disconnect_client,90000,sessionid);
 }
 
 exports.handlers=io_handlers;
